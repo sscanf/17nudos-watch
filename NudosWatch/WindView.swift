@@ -3,64 +3,69 @@ import SwiftUI
 struct WindView: View {
     @Environment(StationService.self) private var service
 
+    // Sin ScrollView cuando la página cabe: dentro del TabView de páginas verticales,
+    // un ScrollView se queda con el primer gesto aunque solo sobren unos píxeles,
+    // y hacían falta dos deslizamientos para cambiar de página.
     var body: some View {
-        // El ScrollView existe desde el principio y solo cambia su contenido,
-        // para no insertar una vista desplazable a mitad de maquetación.
-        ScrollView {
-            if let r = service.reading {
-                VStack(spacing: 6) {
-                    HStack(alignment: .center, spacing: 8) {
-                        CompassView(degrees: r.grados)
-                            .frame(width: 64, height: 64)
-                        VStack(alignment: .leading, spacing: 0) {
-                            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                                Text(r.actual.fmt())
-                                    .font(.system(size: 40, weight: .bold, design: .rounded))
-                                    .monospacedDigit()
-                                    .minimumScaleFactor(0.6)
-                                Text("kn").font(.footnote)
-                            }
-                            .foregroundStyle(Theme.viento(r.actual))
-                            Text("\(r.direccion) · \(r.grados.fmt(0))°")
-                                .font(.footnote.weight(.semibold))
-                            if !r.nombre.isEmpty {
-                                Text(r.nombre.capitalized)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .lineLimit(1)
-                    }
-
-                    HStack(spacing: 6) {
-                        Tile(title: "Promedio", value: r.promedio.fmt(), unit: "kn",
-                             color: Theme.viento(r.promedio, base: Theme.azul))
-                        Tile(title: "Racha", value: r.racha.fmt(), unit: "kn",
-                             color: Theme.viento(r.racha))
-                    }
-
-                    // Una sola línea al final: así la página cabe entera en la pantalla
-                    // y un solo gesto pasa a la siguiente, sin desplazamiento previo.
-                    if let e = service.error {
-                        Label(e, systemImage: "wifi.exclamationmark")
-                            .font(.caption2)
-                            .foregroundStyle(Theme.rojo)
-                    } else {
-                        TrendRow(reading: r)
-                    }
-                }
-            } else if let e = service.error {
-                VStack(spacing: 8) {
-                    Label(e, systemImage: "wifi.exclamationmark")
-                        .multilineTextAlignment(.center)
-                    Button("Reintentar") { Task { await service.refresh() } }
-                }
-            } else {
-                ProgressView("Conectando…")
-                    .padding(.top, 30)
-            }
+        ViewThatFits(in: .vertical) {
+            content
+            ScrollView { content }  // relojes pequeños donde no cabe
         }
-        .scrollBounceBehavior(.basedOnSize)
+    }
+
+    @ViewBuilder private var content: some View {
+        if let r = service.reading {
+            VStack(spacing: 6) {
+                HStack(alignment: .center, spacing: 8) {
+                    CompassView(degrees: r.grados)
+                        .frame(width: 64, height: 64)
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack(alignment: .firstTextBaseline, spacing: 2) {
+                            Text(r.actual.fmt())
+                                .font(.system(size: 40, weight: .bold, design: .rounded))
+                                .monospacedDigit()
+                                .minimumScaleFactor(0.6)
+                            Text("kn").font(.footnote)
+                        }
+                        .foregroundStyle(Theme.viento(r.actual))
+                        Text("\(r.direccion) · \(r.grados.fmt(0))°")
+                            .font(.footnote.weight(.semibold))
+                        if !r.nombre.isEmpty {
+                            Text(r.nombre.capitalized)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .lineLimit(1)
+                }
+
+                HStack(spacing: 6) {
+                    Tile(title: "Promedio", value: r.promedio.fmt(), unit: "kn",
+                         color: Theme.viento(r.promedio, base: Theme.azul))
+                    Tile(title: "Racha", value: r.racha.fmt(), unit: "kn",
+                         color: Theme.viento(r.racha))
+                }
+
+                // Una sola línea al final: así la página cabe entera en la pantalla
+                // y un solo gesto pasa a la siguiente, sin desplazamiento previo.
+                if let e = service.error {
+                    Label(e, systemImage: "wifi.exclamationmark")
+                        .font(.caption2)
+                        .foregroundStyle(Theme.rojo)
+                } else {
+                    TrendRow(reading: r)
+                }
+            }
+        } else if let e = service.error {
+            VStack(spacing: 8) {
+                Label(e, systemImage: "wifi.exclamationmark")
+                    .multilineTextAlignment(.center)
+                Button("Reintentar") { Task { await service.refresh() } }
+            }
+        } else {
+            ProgressView("Conectando…")
+                .padding(.top, 30)
+        }
     }
 }
 
