@@ -39,15 +39,14 @@ struct WindView: View {
                              color: Theme.viento(r.racha))
                     }
 
-                    TrendRow(reading: r)
-
-                    Text(r.actualizado)
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                    // Una sola línea al final: así la página cabe entera en la pantalla
+                    // y un solo gesto pasa a la siguiente, sin desplazamiento previo.
                     if let e = service.error {
                         Label(e, systemImage: "wifi.exclamationmark")
                             .font(.caption2)
                             .foregroundStyle(Theme.rojo)
+                    } else {
+                        TrendRow(reading: r)
                     }
                 }
             } else if let e = service.error {
@@ -61,6 +60,7 @@ struct WindView: View {
                     .padding(.top, 30)
             }
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 

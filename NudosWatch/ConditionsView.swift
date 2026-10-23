@@ -20,11 +20,10 @@ struct ConditionsView: View {
                     Tile(title: "Máx 15′", value: (r?.rachamax15).fmt(), unit: "kn",
                          color: Theme.viento(r?.rachamax15))
                 }
-                Text("Castelldefels")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
             }
         }
+        // si cabe en pantalla no hay desplazamiento: un gesto pasa de página
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private struct Row: View {
