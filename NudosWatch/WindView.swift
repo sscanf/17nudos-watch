@@ -15,14 +15,14 @@ struct WindView: View {
 
     @ViewBuilder private var content: some View {
         if let r = service.reading {
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 HStack(alignment: .center, spacing: 8) {
                     CompassView(degrees: r.grados)
-                        .frame(width: 64, height: 64)
+                        .frame(width: 56, height: 56)
                     VStack(alignment: .leading, spacing: 0) {
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
                             Text(r.actual.fmt())
-                                .font(.system(size: 40, weight: .bold, design: .rounded))
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
                                 .monospacedDigit()
                                 .minimumScaleFactor(0.6)
                             Text("kn").font(.footnote)
@@ -89,7 +89,7 @@ struct Tile: View {
             .foregroundStyle(color)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
         .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
     }
 }
@@ -150,12 +150,12 @@ struct CompassView: View {
                 Text(l)
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(l == "N" ? Theme.naranja : .secondary)
-                    .offset(y: -24)
+                    .offset(y: -20)
                     .rotationEffect(.degrees(Double(i) * 90))
             }
             if let degrees {
                 Image(systemName: "location.north.fill")
-                    .font(.system(size: 22))
+                    .font(.system(size: 19))
                     .foregroundStyle(Theme.naranja)
                     .rotationEffect(.degrees(degrees + 180))
                     .animation(.easeInOut, value: degrees)

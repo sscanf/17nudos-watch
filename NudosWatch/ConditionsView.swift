@@ -13,7 +13,7 @@ struct ConditionsView: View {
 
     private var content: some View {
         let r = service.reading
-        return VStack(spacing: 6) {
+        return VStack(spacing: 4) {
             Row(icon: "thermometer.medium", title: "Temperatura",
                 value: "\(r?.temperatura.fmt() ?? "—") °C",
                 color: Theme.temperatura(r?.temperatura))
@@ -49,7 +49,7 @@ struct ConditionsView: View {
                     .foregroundStyle(color)
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.vertical, 4)
             .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
         }
     }
