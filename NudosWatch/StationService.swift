@@ -1,0 +1,49 @@
+import Foundation
+import Observation
+
+/// Estado de la app: última lectura de la estación y gráfica.
+@MainActor
+@Observable
+final class StationService {
+    private(set) var reading: StationReading?
+    private(set) var history: WindHistory?
+    private(set) var lastFetch: Date?
+    private(set) var error: String?
+    private(set) var isLoading = false
+
+    /// Horas de histórico que se muestran en la gráfica.
+    static let historyHours = 3
+
+    /// En el lienzo de Xcode no se descarga nada: se usan datos de ejemplo.
+    static let isPreview: Bool = {
+        // según la versión de Xcode, el lienzo define una u otra
+        let env = ProcessInfo.processInfo.environment
+        return env["XCODE_RUNNING_FOR_PREVIEWS"] == "1" || env["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
+    }()
+
+    init(reading: StationReading? = nil, history: WindHistory? = nil) {
+        self.reading = reading
+        self.history = history
+    }
+
+    static var preview: StationService {
+        StationService(reading: .placeholder, history: .placeholder)
+    }
+
+    func refresh(includeHistory: Bool = true) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            async let r = StationAPI.reading()
+            if includeHistory {
+                // la gráfica es secundaria: si falla, se conserva la anterior
+                history = (try? await StationAPI.history(hours: Self.historyHours)) ?? history
+            }
+            reading = try await r
+            lastFetch = .now
+            error = nil
+        } catch {
+            self.error = "Sin conexión con la estación"
+        }
+    }
+}
