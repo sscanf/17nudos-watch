@@ -12,8 +12,8 @@ struct ContentView: View {
     // navegación con un título por página hacía caer las previews de Xcode.
     var body: some View {
         TabView {
-            Page(title: "17nudos") { WindView() }
-            Page(title: "Condiciones") { ConditionsView() }
+            Page(title: "17nudos", useBottomInset: true) { WindView() }
+            Page(title: "Condiciones", useBottomInset: true) { ConditionsView() }
             Page(title: "Últimas \(StationService.historyHours) h") { HistoryChartView() }
             ForEach(Camera.all) { cam in
                 Page(title: "Cámara") { CameraView(camera: cam) }
@@ -41,6 +41,10 @@ struct ContentView: View {
 /// Página con su título como cabecera.
 private struct Page<Content: View>: View {
     var title: String
+    /// El TabView de páginas reserva ~39 pt abajo que en pantalla están vacíos. Si el
+    /// contenido no cabe en lo que queda, watchOS desplaza la página antes de pasar a la
+    /// siguiente (dos gestos). Las páginas de texto usan también esa franja.
+    var useBottomInset = false
     @ViewBuilder var content: Content
 
     var body: some View {
@@ -52,6 +56,7 @@ private struct Page<Content: View>: View {
             content
                 .frame(maxHeight: .infinity, alignment: .top)
         }
+        .ignoresSafeArea(.container, edges: useBottomInset ? .bottom : [])
     }
 }
 

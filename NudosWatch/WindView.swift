@@ -3,17 +3,17 @@ import SwiftUI
 struct WindView: View {
     @Environment(StationService.self) private var service
 
-    // Sin ScrollView cuando la página cabe: dentro del TabView de páginas verticales,
-    // un ScrollView se queda con el primer gesto aunque solo sobren unos píxeles,
-    // y hacían falta dos deslizamientos para cambiar de página.
+    // Nunca un ScrollView: dentro del TabView de páginas verticales se queda con el
+    // primer gesto aunque solo sobren unos píxeles, y hacían falta dos deslizamientos
+    // para cambiar de página. En relojes pequeños se oculta la última línea.
     var body: some View {
         ViewThatFits(in: .vertical) {
-            content
-            ScrollView { content }  // relojes pequeños donde no cabe
+            content(footer: true)
+            content(footer: false)
         }
     }
 
-    @ViewBuilder private var content: some View {
+    @ViewBuilder private func content(footer: Bool) -> some View {
         if let r = service.reading {
             VStack(spacing: 4) {
                 HStack(alignment: .center, spacing: 8) {
@@ -46,9 +46,9 @@ struct WindView: View {
                          color: Theme.viento(r.racha))
                 }
 
-                // Una sola línea al final: así la página cabe entera en la pantalla
-                // y un solo gesto pasa a la siguiente, sin desplazamiento previo.
-                if let e = service.error {
+                if !footer {
+                    EmptyView()
+                } else if let e = service.error {
                     Label(e, systemImage: "wifi.exclamationmark")
                         .font(.caption2)
                         .foregroundStyle(Theme.rojo)
