@@ -7,6 +7,8 @@ import Observation
 final class StationService {
     private(set) var reading: StationReading?
     private(set) var history: WindHistory?
+    private(set) var forecast: Forecast?
+    private var forecastFetch: Date?
     private(set) var lastFetch: Date?
     private(set) var error: String?
     private(set) var isLoading = false
@@ -21,13 +23,17 @@ final class StationService {
         return env["XCODE_RUNNING_FOR_PREVIEWS"] == "1" || env["XCODE_RUNNING_FOR_PLAYGROUNDS"] == "1"
     }()
 
-    init(reading: StationReading? = nil, history: WindHistory? = nil) {
+    /// AEMET actualiza la previsión pocas veces al día.
+    static let forecastEvery: TimeInterval = 30 * 60
+
+    init(reading: StationReading? = nil, history: WindHistory? = nil, forecast: Forecast? = nil) {
         self.reading = reading
         self.history = history
+        self.forecast = forecast
     }
 
     static var preview: StationService {
-        StationService(reading: .placeholder, history: .placeholder)
+        StationService(reading: .placeholder, history: .placeholder, forecast: .placeholder)
     }
 
     func refresh(includeHistory: Bool = true) async {
@@ -38,6 +44,11 @@ final class StationService {
             if includeHistory {
                 // la gráfica es secundaria: si falla, se conserva la anterior
                 history = (try? await StationAPI.history(hours: Self.historyHours)) ?? history
+            }
+            if forecastFetch.map({ Date.now.timeIntervalSince($0) > Self.forecastEvery }) ?? true,
+               let f = try? await StationAPI.forecast() {
+                forecast = f
+                forecastFetch = .now
             }
             reading = try await r
             lastFetch = .now

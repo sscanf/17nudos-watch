@@ -8,6 +8,7 @@ enum StationAPI {
     private static let base = URL(string: "https://www.17nudos.com/")!
     private static let stationURL = URL(string: "estacion_datos_mdx.php", relativeTo: base)!
     private static let historyURL = URL(string: "grafica_datos_mdx.php", relativeTo: base)!
+    private static let forecastURL = URL(string: "prevision_mdx.php", relativeTo: base)!
 
     private static let session: URLSession = {
         let cfg = URLSessionConfiguration.ephemeral
@@ -22,6 +23,10 @@ enum StationAPI {
 
     static func history(hours: Int) async throws -> WindHistory {
         try await fetch(historyURL, query: ["horas": "\(hours)"])
+    }
+
+    static func forecast() async throws -> Forecast {
+        try await fetch(forecastURL, query: [:])
     }
 
     private static func fetch<T: Decodable>(_ url: URL, query: [String: String]) async throws -> T {

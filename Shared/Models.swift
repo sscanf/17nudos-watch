@@ -105,6 +105,101 @@ struct WindHistory: Decodable {
     }
 }
 
+/// Previsión horaria de AEMET que publica la web (`prevision_mdx.php`).
+/// Las horas vienen en hora local de Castelldefels, separadas por días.
+struct Forecast: Decodable {
+    var fuente: String
+    var hours: [Hour]
+
+    struct Hour: Identifiable {
+        var id: Date { date }
+        var date: Date
+        var viento: Double?
+        var racha: Double?
+        var direccion: String
+        var grados: Double?
+        var temperatura: Double?
+        var cielo: String
+    }
+
+    private enum CodingKeys: String, CodingKey { case fuente, dias }
+
+    private struct Day: Decodable {
+        var fecha: String
+        var horas: [RawHour]
+    }
+
+    private struct RawHour: Decodable {
+        var hora: Int
+        var viento: Double?, racha: Double?, grados: Double?, temp: Double?
+        var dir: String, cielo: String
+
+        private enum CodingKeys: String, CodingKey {
+            case hora, viento_kn, racha_kn, grados, temp, dir, cielo
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            hora = try c.decode(Int.self, forKey: .hora)
+            viento = c.flexibleDouble(.viento_kn)
+            racha = c.flexibleDouble(.racha_kn)
+            grados = c.flexibleDouble(.grados)
+            temp = c.flexibleDouble(.temp)
+            dir = c.cleanString(.dir) ?? "—"
+            cielo = c.cleanString(.cielo) ?? ""
+        }
+    }
+
+    private static let calendar: Calendar = {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Europe/Madrid")!
+        return cal
+    }()
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        fuente = c.cleanString(.fuente) ?? "AEMET"
+        let dias = try c.decode([Day].self, forKey: .dias)
+        hours = dias.flatMap { day -> [Hour] in
+            let parts = day.fecha.split(separator: "-").compactMap { Int($0) }
+            guard parts.count == 3 else { return [] }
+            return day.horas.compactMap { h in
+                let comps = DateComponents(year: parts[0], month: parts[1], day: parts[2], hour: h.hora)
+                guard let date = Self.calendar.date(from: comps) else { return nil }
+                return Hour(date: date, viento: h.viento, racha: h.racha, direccion: h.dir,
+                            grados: h.grados, temperatura: h.temp, cielo: h.cielo)
+            }
+        }
+    }
+
+    /// Horas desde la actual en adelante.
+    func upcoming(from now: Date = .now, count: Int? = nil) -> [Hour] {
+        let start = now.addingTimeInterval(-3600)
+        let next = hours.filter { $0.date > start }
+        return count.map { Array(next.prefix($0)) } ?? next
+    }
+
+    /// Dos días de viento inventado (térmico de tarde) para las vistas previas.
+    static let placeholder: Forecast = {
+        let cal = calendar
+        let today = cal.startOfDay(for: .now)
+        let dias = (0..<2).map { d -> String in
+            let date = cal.date(byAdding: .day, value: d, to: today)!
+            let c = cal.dateComponents([.year, .month, .day], from: date)
+            let horas = (0..<24).map { h -> String in
+                let v = max(2, 12 * sin(Double(h - 9) / 10 * .pi))
+                let deg = h >= 11 && h <= 19 ? 225 : 0
+                let cielo = h % 5 == 0 ? "Nuboso" : "Poco nuboso"
+                return #"{"hora":\#(h),"viento_kn":\#(v.rounded()),"racha_kn":\#((v * 1.4).rounded()),"dir":"\#(deg == 0 ? "N" : "SW")","grados":\#(deg),"temp":\#(16 + h / 3),"cielo":"\#(cielo)"}"#
+            }
+            let fecha = String(format: "%04d-%02d-%02d", c.year!, c.month!, c.day!)
+            return #"{"fecha":"\#(fecha)","horas":[\#(horas.joined(separator: ","))]}"#
+        }
+        let json = #"{"fuente":"AEMET","dias":[\#(dias.joined(separator: ","))]}"#
+        return try! JSONDecoder().decode(Forecast.self, from: Data(json.utf8))
+    }()
+}
+
 private extension KeyedDecodingContainer {
     func flexibleDouble(_ key: Key) -> Double? {
         if let d = try? decodeIfPresent(Double.self, forKey: key) { return d }
