@@ -19,6 +19,8 @@ struct WindView: View {
                 HStack(alignment: .center, spacing: 8) {
                     CompassView(degrees: r.grados)
                         .frame(width: 74, height: 74)
+                        // centrada en el hueco entre el borde y los nudos, que cambian de ancho
+                        .frame(maxWidth: .infinity)
                     VStack(alignment: .leading, spacing: 0) {
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
                             Text(r.actual.fmt())
@@ -37,6 +39,7 @@ struct WindView: View {
                         }
                     }
                     .lineLimit(1)
+                    .padding(.trailing, 10)  // sin tapar los puntos de página
                 }
 
                 HStack(spacing: 6) {
