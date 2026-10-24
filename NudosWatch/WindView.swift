@@ -18,7 +18,7 @@ struct WindView: View {
             VStack(spacing: 4) {
                 HStack(alignment: .center, spacing: 8) {
                     CompassView(degrees: r.grados)
-                        .frame(width: 56, height: 56)
+                        .frame(width: 74, height: 74)
                     VStack(alignment: .leading, spacing: 0) {
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
                             Text(r.actual.fmt())
@@ -144,22 +144,27 @@ struct CompassView: View {
     var degrees: Double?
 
     var body: some View {
-        ZStack {
-            Circle().stroke(.white.opacity(0.25), lineWidth: 2)
-            ForEach(Array(["N", "E", "S", "W"].enumerated()), id: \.offset) { i, l in
-                Text(l)
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(l == "N" ? Theme.naranja : .secondary)
-                    .offset(y: -20)
-                    .rotationEffect(.degrees(Double(i) * 90))
+        // las letras y la flecha crecen con el tamaño que se le dé
+        GeometryReader { geo in
+            let d = min(geo.size.width, geo.size.height)
+            ZStack {
+                Circle().stroke(.white.opacity(0.25), lineWidth: 2)
+                ForEach(Array(["N", "E", "S", "W"].enumerated()), id: \.offset) { i, l in
+                    Text(l)
+                        .font(.system(size: d * 0.16, weight: .bold))
+                        .foregroundStyle(l == "N" ? Theme.naranja : .secondary)
+                        .offset(y: -d * 0.36)
+                        .rotationEffect(.degrees(Double(i) * 90))
+                }
+                if let degrees {
+                    Image(systemName: "location.north.fill")
+                        .font(.system(size: d * 0.34))
+                        .foregroundStyle(Theme.naranja)
+                        .rotationEffect(.degrees(degrees + 180))
+                        .animation(.easeInOut, value: degrees)
+                }
             }
-            if let degrees {
-                Image(systemName: "location.north.fill")
-                    .font(.system(size: 19))
-                    .foregroundStyle(Theme.naranja)
-                    .rotationEffect(.degrees(degrees + 180))
-                    .animation(.easeInOut, value: degrees)
-            }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
     }
 }
