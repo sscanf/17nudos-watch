@@ -16,14 +16,13 @@ struct ContentView: View {
     // navegación con un título por página hacía caer las previews de Xcode.
     //
     // Los ajustes van a la izquierda de todas las páginas, no dentro de la primera:
-    // así desde ellos no se puede pasar de página en vertical. Solo existen mientras
-    // se está en la primera página, para llegar a ellos solo desde ahí.
+    // así desde ellos no se puede pasar de página en vertical. Siempre están ahí:
+    // quitarlos y volver a ponerlos al cambiar de página cortaba el gesto de volver
+    // a la primera. Para llegar solo desde la primera se bloquea el gesto lateral.
     var body: some View {
         TabView(selection: $side) {
-            if page == 0 {
-                Page(title: "Ajustes", useBottomInset: true) { SettingsView() }
-                    .tag(Side.settings)
-            }
+            Page(title: "Ajustes", useBottomInset: true) { SettingsView() }
+                .tag(Side.settings)
             TabView(selection: $page) {
                 Page(title: "17nudos", useBottomInset: true) { WindView() }.tag(0)
                 Page(title: "Condiciones", useBottomInset: true) { ConditionsView() }.tag(1)
@@ -34,10 +33,12 @@ struct ContentView: View {
                 }
             }
             .tabViewStyle(.verticalPage)
+            .scrollDisabled(false)  // el bloqueo de abajo es solo para el gesto lateral
             .tag(Side.main)
         }
         // sin puntos: abajo no sobra sitio
         .tabViewStyle(.page(indexDisplayMode: .never))
+        .scrollDisabled(side == .main && page != 0)
         .task(id: scenePhase) {
             guard !StationService.isPreview else { return }
             guard scenePhase == .active else {
