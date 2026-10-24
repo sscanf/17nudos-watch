@@ -16,6 +16,7 @@ struct ContentView: View {
             Page(title: "Condiciones", useBottomInset: true) { ConditionsView() }
             Page(title: "Últimas \(StationService.historyHours) h") { HistoryChartView() }
             Page(title: "Previsión") { ForecastView() }
+            Page(title: "Alarma", useBottomInset: true) { AlarmView() }
             ForEach(Camera.all) { cam in
                 Page(title: "Cámara") { CameraView(camera: cam) }
             }

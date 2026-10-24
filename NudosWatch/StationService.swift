@@ -51,6 +51,7 @@ final class StationService {
                 forecastFetch = .now
             }
             reading = try await r
+            reading.map(WindAlarm.check)
             lastFetch = .now
             error = nil
         } catch {
