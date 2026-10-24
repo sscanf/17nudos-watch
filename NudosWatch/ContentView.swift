@@ -12,14 +12,13 @@ struct ContentView: View {
     // navegación con un título por página hacía caer las previews de Xcode.
     var body: some View {
         TabView {
-            Page(title: "17nudos", useBottomInset: true) { WindView() }
+            HomePage()
             Page(title: "Condiciones", useBottomInset: true) { ConditionsView() }
             Page(title: "Últimas \(StationService.historyHours) h") { HistoryChartView() }
             Page(title: "Previsión") { ForecastView() }
             ForEach(Camera.all) { cam in
                 Page(title: "Cámara") { CameraView(camera: cam) }
             }
-            Page(title: "Ajustes", useBottomInset: true) { SettingsView() }
         }
         .tabViewStyle(.verticalPage)
         .task(id: scenePhase) {
@@ -37,6 +36,20 @@ struct ContentView: View {
                 try? await Task.sleep(for: refreshEvery)
             }
         }
+    }
+}
+
+/// Primera página: el viento y, deslizando hacia la derecha, los ajustes.
+private struct HomePage: View {
+    @State private var page = 1
+
+    var body: some View {
+        TabView(selection: $page) {
+            Page(title: "Ajustes", useBottomInset: true) { SettingsView() }.tag(0)
+            Page(title: "17nudos", useBottomInset: true) { WindView() }.tag(1)
+        }
+        // sin puntos: abajo no sobra sitio
+        .tabViewStyle(.page(indexDisplayMode: .never))
     }
 }
 
