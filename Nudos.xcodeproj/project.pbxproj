@@ -37,6 +37,7 @@
 /* Begin PBXFileReference section */
 		A10000000000000000000001 /* 17nudos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 17nudos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B10000000000000000000001 /* NudosComplication.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NudosComplication.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10000000000000000000001 /* NudosPhone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NudosPhone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -53,6 +54,16 @@
 		B10000000000000000000003 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		C10000000000000000000002 /* NudosPhone */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NudosPhone;
+			sourceTree = "<group>";
+		};
+		C10000000000000000000003 /* AppShared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AppShared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -72,6 +83,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C10000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -80,6 +98,8 @@
 			children = (
 				A10000000000000000000002 /* NudosWatch */,
 				B10000000000000000000002 /* NudosComplication */,
+				C10000000000000000000002 /* NudosPhone */,
+				C10000000000000000000003 /* AppShared */,
 				B10000000000000000000003 /* Shared */,
 				A10000000000000000000005 /* Products */,
 			);
@@ -90,6 +110,7 @@
 			children = (
 				A10000000000000000000001 /* 17nudos.app */,
 				B10000000000000000000001 /* NudosComplication.appex */,
+				C10000000000000000000001 /* NudosPhone.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -113,6 +134,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				A10000000000000000000002 /* NudosWatch */,
+				C10000000000000000000003 /* AppShared */,
 				B10000000000000000000003 /* Shared */,
 			);
 			name = NudosWatch;
@@ -141,6 +163,28 @@
 			productReference = B10000000000000000000001 /* NudosComplication.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		C10000000000000000000006 /* NudosPhone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C10000000000000000000007 /* Build configuration list for PBXNativeTarget "NudosPhone" */;
+			buildPhases = (
+				C10000000000000000000008 /* Sources */,
+				C10000000000000000000004 /* Frameworks */,
+				C10000000000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C10000000000000000000002 /* NudosPhone */,
+				C10000000000000000000003 /* AppShared */,
+				B10000000000000000000003 /* Shared */,
+			);
+			name = NudosPhone;
+			productName = NudosPhone;
+			productReference = C10000000000000000000001 /* NudosPhone.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -155,6 +199,9 @@
 						CreatedOnToolsVersion = 27.0;
 					};
 					B10000000000000000000006 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					C10000000000000000000006 = {
 						CreatedOnToolsVersion = 27.0;
 					};
 				};
@@ -175,6 +222,7 @@
 			targets = (
 				A10000000000000000000006 /* NudosWatch */,
 				B10000000000000000000006 /* NudosComplication */,
+				C10000000000000000000006 /* NudosPhone */,
 			);
 		};
 /* End PBXProject section */
@@ -194,6 +242,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C10000000000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -205,6 +260,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B10000000000000000000008 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C10000000000000000000008 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -377,6 +439,66 @@
 			};
 			name = Release;
 		};
+		C1000000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X74626NUF9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/NudosPhone-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = 17nudos;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oscarcasamitjana.nudos.iphone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C1000000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X74626NUF9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/NudosPhone-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = 17nudos;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oscarcasamitjana.nudos.iphone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -403,6 +525,15 @@
 			buildConfigurations = (
 				B1000000000000000000000A /* Debug */,
 				B1000000000000000000000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C10000000000000000000007 /* Build configuration list for PBXNativeTarget "NudosPhone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1000000000000000000000A /* Debug */,
+				C1000000000000000000000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

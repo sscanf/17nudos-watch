@@ -1,9 +1,9 @@
 import Foundation
 import UserNotifications
-import WatchKit
 
 /// Aviso cuando el viento supera un umbral. Se comprueba con cada lectura mientras la app
-/// está abierta y, con la app cerrada, en las actualizaciones en segundo plano de watchOS.
+/// está abierta y, con la app cerrada, en las actualizaciones en segundo plano del sistema
+/// (cada plataforma programa las suyas: `AppDelegate` en el reloj, `NudosPhoneApp` en el iPhone).
 enum WindAlarm {
     enum Metric: String, CaseIterable {
         case racha, promedio, actual
@@ -35,7 +35,8 @@ enum WindAlarm {
     static let thresholdRange = 5...40
     /// Tiene que bajar esto por debajo del umbral para volver a avisar (evita avisos en ráfaga).
     static let hysteresis = 2.0
-    /// watchOS da unas 4 actualizaciones por hora (si la complicación está en la esfera).
+    /// Cada cuánto se pide revisar en segundo plano. Es un mínimo: el sistema decide
+    /// (watchOS da unas 4 por hora si la complicación está en la esfera; iOS, según el uso).
     static let backgroundEvery: TimeInterval = 15 * 60
 
     private static var defaults: UserDefaults { .standard }
@@ -79,45 +80,5 @@ enum WindAlarm {
         content.sound = .default
         let request = UNNotificationRequest(identifier: "viento", content: content, trigger: nil)
         UNUserNotificationCenter.current().add(request)
-    }
-
-    // MARK: Segundo plano
-
-    static func scheduleBackgroundCheck() {
-        guard isEnabled else { return }
-        WKApplication.shared().scheduleBackgroundRefresh(
-            withPreferredDate: .now.addingTimeInterval(backgroundEvery), userInfo: nil) { _ in }
-    }
-}
-
-/// Recibe las tareas en segundo plano y muestra la notificación también con la app abierta.
-final class AppDelegate: NSObject, WKApplicationDelegate, UNUserNotificationCenterDelegate {
-    func applicationDidFinishLaunching() {
-        UNUserNotificationCenter.current().delegate = self
-    }
-
-    func applicationDidEnterBackground() {
-        WindAlarm.scheduleBackgroundCheck()
-    }
-
-    func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
-        for task in backgroundTasks {
-            guard let refresh = task as? WKApplicationRefreshBackgroundTask else {
-                task.setTaskCompletedWithSnapshot(false)
-                continue
-            }
-            Task {
-                if WindAlarm.isEnabled, let r = try? await Station.selected.source.reading() {
-                    WindAlarm.check(r)
-                }
-                WindAlarm.scheduleBackgroundCheck()
-                refresh.setTaskCompletedWithSnapshot(false)
-            }
-        }
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification)
-        async -> UNNotificationPresentationOptions {
-        [.banner, .sound]
     }
 }

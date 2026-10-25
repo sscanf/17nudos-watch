@@ -67,10 +67,10 @@ struct CameraView: View {
 
     private func load() async {
         if videoID == nil {
-            videoID = await Self.currentVideoID(for: camera) ?? camera.fallbackVideoID
+            videoID = await CameraFeed.currentVideoID(for: camera) ?? camera.fallbackVideoID
         }
         guard let id = videoID else { return }
-        if let img = await Self.liveImage(videoID: id, quality: .thumbnail) {
+        if let img = await CameraFeed.liveImage(videoID: id, quality: .thumbnail) {
             image = img
             updated = .now
             failed = false
@@ -79,36 +79,6 @@ struct CameraView: View {
             videoID = nil
             failed = image == nil
         }
-    }
-
-    fileprivate static func currentVideoID(for camera: Camera) async -> String? {
-        var req = URLRequest(url: camera.embed)
-        if let referer = camera.referer {
-            req.setValue(referer.absoluteString, forHTTPHeaderField: "Referer")
-        }
-        guard let (data, _) = try? await URLSession.shared.data(for: req),
-              let html = String(data: data, encoding: .utf8),
-              let m = html.firstMatch(of: #/youtube\.com/embed/([A-Za-z0-9_-]{11})/#)
-        else { return nil }
-        return String(m.1)
-    }
-
-    enum Quality: String {
-        /// 480×360 (16:9 con bandas negras), ~15 KB
-        case thumbnail = "hqdefault_live"
-        /// 1280×720, ~150 KB: solo para la vista ampliada
-        case hd = "maxresdefault_live"
-    }
-
-    fileprivate static func liveImage(videoID: String, quality: Quality) async -> UIImage? {
-        let ts = Int(Date().timeIntervalSince1970)
-        guard let url = URL(string: "https://i.ytimg.com/vi/\(videoID)/\(quality.rawValue).jpg?t=\(ts)") else { return nil }
-        var req = URLRequest(url: url)
-        req.cachePolicy = .reloadIgnoringLocalCacheData
-        guard let (data, resp) = try? await URLSession.shared.data(for: req),
-              (resp as? HTTPURLResponse)?.statusCode == 200
-        else { return nil }
-        return UIImage(data: data)
     }
 }
 
@@ -197,8 +167,8 @@ private struct CameraZoomView: View {
         }
         .task {
             guard !StationService.isPreview else { return }
-            let id: String? = if let videoID { videoID } else { await CameraView.currentVideoID(for: camera) }
-            if let id { hd = await CameraView.liveImage(videoID: id, quality: .hd) }
+            let id: String? = if let videoID { videoID } else { await CameraFeed.currentVideoID(for: camera) }
+            if let id { hd = await CameraFeed.liveImage(videoID: id, quality: .hd) }
         }
     }
 
