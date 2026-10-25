@@ -4,11 +4,14 @@ import SwiftUI
 /// y, en naranja, entre qué rumbos ha oscilado el viento en los últimos 15 minutos.
 struct CompassDetailView: View {
     @Environment(StationService.self) private var service
+    @Environment(\.dismiss) private var dismiss
 
+    // a pantalla completa y por debajo de la hora: se cierra tocando en cualquier sitio
     var body: some View {
         let r = service.reading
         let spread = service.history?.directionSpread()
-        VStack(spacing: 2) {
+        ZStack {
+            Color.black
             ZStack {
                 Dial(spread: spread)
                 if let deg = r?.grados {
@@ -16,38 +19,42 @@ struct CompassDetailView: View {
                         Needle(head: false).fill(.white.opacity(0.5))
                         Needle(head: true).fill(Theme.naranja)
                     }
-                        .padding(12)
-                        .rotationEffect(.degrees(deg))  // hacia donde viene
-                        .animation(.easeInOut, value: deg)
+                    .padding(14)
+                    .rotationEffect(.degrees(deg))  // hacia donde viene
+                    .animation(.easeInOut, value: deg)
                 }
-                // centro: el número tapa el pie de la aguja
+                // centro: tapa el pie de la aguja
                 VStack(spacing: -2) {
                     Text("\(r?.grados.fmt(0) ?? "—")°")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .monospacedDigit()
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
                     Text(r?.direccion ?? "")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(.secondary)
+                    Text("\(r?.actual.fmt() ?? "—") kn")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Theme.viento(r?.actual))
                 }
-                .frame(width: 52, height: 52)
+                .monospacedDigit()
+                .frame(width: 72, height: 72)
                 .background(.black, in: Circle())
                 .overlay(Circle().stroke(.white.opacity(0.25), lineWidth: 1))
             }
             .aspectRatio(1, contentMode: .fit)
+            .padding(2)
 
-            HStack(spacing: 6) {
-                Text("\(r?.actual.fmt() ?? "—") kn")
-                    .foregroundStyle(Theme.viento(r?.actual))
-                if let spread {
-                    Text("15′ \(Self.range(spread))")
-                        .foregroundStyle(Theme.naranja)
-                }
+            if let spread {
+                Text("15′ \(Self.range(spread))")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(Theme.naranja)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .padding(.bottom, 4)
             }
-            .font(.system(size: 13, weight: .semibold, design: .rounded))
-            .monospacedDigit()
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
         }
+        .ignoresSafeArea()
+        .toolbar(.hidden, for: .navigationBar)
+        .contentShape(Rectangle())
+        .onTapGesture { dismiss() }
     }
 
     /// "205°–240°": de dónde ha venido el viento en el último cuarto de hora.
@@ -90,8 +97,8 @@ struct CompassDetailView: View {
                     }
                     ForEach(Array(stride(from: 0, to: 360, by: 30)), id: \.self) { deg in
                         Label(deg: deg)
-                            .position(x: center.x + sin(Double(deg) * .pi / 180) * (radius - 22),
-                                      y: center.y - cos(Double(deg) * .pi / 180) * (radius - 22))
+                            .position(x: center.x + sin(Double(deg) * .pi / 180) * (radius - 24),
+                                      y: center.y - cos(Double(deg) * .pi / 180) * (radius - 24))
                     }
                 }
             }
@@ -104,11 +111,11 @@ struct CompassDetailView: View {
             var body: some View {
                 if let c = Self.cardinals[deg] {
                     Text(c)
-                        .font(.system(size: 15, weight: .heavy))
+                        .font(.system(size: 18, weight: .heavy))
                         .foregroundStyle(deg == 0 ? Theme.naranja : .white)
                 } else {
                     Text("\(deg)")
-                        .font(.system(size: 10, weight: .medium))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
             }

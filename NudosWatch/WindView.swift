@@ -12,7 +12,7 @@ struct WindView: View {
             content(footer: true)
             content(footer: false)
         }
-        .sheet(isPresented: $showCompass) { CompassDetailView() }
+        .fullScreenCover(isPresented: $showCompass) { CompassDetailView() }
     }
 
     @ViewBuilder private func content(footer: Bool) -> some View {
