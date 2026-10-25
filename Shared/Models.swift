@@ -62,9 +62,11 @@ struct WindHistory: Decodable {
     var pasoMin: Int
     var nominal: [Double?]
     var racha: [Double?]
+    /// Grados de donde viene el viento.
+    var grados: [Double?]
 
     private enum CodingKeys: String, CodingKey {
-        case inicio, paso_min, nominal, racha
+        case inicio, paso_min, nominal, racha, grados
     }
 
     init(from decoder: Decoder) throws {
@@ -77,6 +79,20 @@ struct WindHistory: Decodable {
         pasoMin = (try? c.decode(Int.self, forKey: .paso_min)) ?? 1
         nominal = (try? c.decode([Double?].self, forKey: .nominal)) ?? []
         racha = (try? c.decode([Double?].self, forKey: .racha)) ?? []
+        grados = (try? c.decode([Double?].self, forKey: .grados)) ?? []
+    }
+
+    /// Hacia dónde ha oscilado el viento en los últimos `minutes` minutos con dato:
+    /// dirección media y lo que se ha separado de ella hacia cada lado (grados).
+    func directionSpread(minutes: Int = 15) -> (mean: Double, left: Double, right: Double)? {
+        let recent = grados.compactMap { $0 }.suffix(max(1, minutes / max(pasoMin, 1)))
+        guard recent.count >= 2 else { return nil }
+        let x = recent.map { sin($0 * .pi / 180) }.reduce(0, +)
+        let y = recent.map { cos($0 * .pi / 180) }.reduce(0, +)
+        let mean = (atan2(x, y) * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
+        // diferencia con signo respecto a la media, entre -180 y 180
+        let diffs = recent.map { ($0 - mean + 540).truncatingRemainder(dividingBy: 360) - 180 }
+        return (mean, max(0, -(diffs.min() ?? 0)), max(0, diffs.max() ?? 0))
     }
 
     /// Tres horas de viento inventado (de 6 a 14 kn) para las vistas previas.
@@ -84,7 +100,8 @@ struct WindHistory: Decodable {
         let nominal = (0..<180).map { i in (10 + 4 * sin(Double(i) / 25)).rounded() }
         let racha = nominal.enumerated().map { i, v in v + 2 + Double(i % 7) / 2 }
         let inicio = ISO8601DateFormatter().string(from: Date.now.addingTimeInterval(-3 * 3600))
-        let json = #"{"inicio":"\#(inicio)","paso_min":1,"nominal":\#(nominal),"racha":\#(racha)}"#
+        let grados = (0..<180).map { i in 225 + 15 * sin(Double(i) / 9) }.map { $0.rounded() }
+        let json = #"{"inicio":"\#(inicio)","paso_min":1,"nominal":\#(nominal),"racha":\#(racha),"grados":\#(grados)}"#
         return try! JSONDecoder().decode(WindHistory.self, from: Data(json.utf8))
     }()
 

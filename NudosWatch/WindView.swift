@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WindView: View {
     @Environment(StationService.self) private var service
+    @State private var showCompass = false
 
     // Nunca un ScrollView: dentro del TabView de páginas verticales se queda con el
     // primer gesto aunque solo sobren unos píxeles, y hacían falta dos deslizamientos
@@ -11,6 +12,7 @@ struct WindView: View {
             content(footer: true)
             content(footer: false)
         }
+        .sheet(isPresented: $showCompass) { CompassDetailView() }
     }
 
     @ViewBuilder private func content(footer: Bool) -> some View {
@@ -19,6 +21,8 @@ struct WindView: View {
                 HStack(alignment: .center, spacing: 8) {
                     CompassView(degrees: r.grados)
                         .frame(width: 100, height: 100)
+                        .contentShape(Circle())
+                        .onTapGesture { showCompass = true }
                         // centrada en el hueco entre el borde y los nudos, que cambian de ancho
                         .frame(maxWidth: .infinity)
                     VStack(alignment: .leading, spacing: 0) {
