@@ -6,7 +6,8 @@ struct CompassDetailView: View {
     @Environment(StationService.self) private var service
     @Environment(\.dismiss) private var dismiss
 
-    // a pantalla completa y por debajo de la hora: se cierra tocando en cualquier sitio
+    // a pantalla completa; se cierra tocando en cualquier sitio. watchOS no deja quitar la hora,
+    // así que la esfera va pegada abajo y el texto arriba a la izquierda, junto a la hora.
     var body: some View {
         let r = service.reading
         let spread = service.history?.directionSpread()
@@ -41,14 +42,16 @@ struct CompassDetailView: View {
             }
             .aspectRatio(1, contentMode: .fit)
             .padding(2)
+            .frame(maxHeight: .infinity, alignment: .bottom)
 
             if let spread {
                 Text("15′ \(Self.range(spread))")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(Theme.naranja)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-                    .padding(.bottom, 4)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(.leading, 10)
+                    .padding(.top, 10)
             }
         }
         .ignoresSafeArea()
