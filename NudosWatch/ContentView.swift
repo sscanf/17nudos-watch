@@ -24,7 +24,8 @@ struct ContentView: View {
             Page(title: "Ajustes", useBottomInset: true) { SettingsView() }
                 .tag(Side.settings)
             TabView(selection: $page) {
-                Page(title: "17nudos", useBottomInset: true) { WindView() }.tag(0)
+                // sin título: así cabe una brújula grande
+                Page(title: nil, useBottomInset: true) { WindView() }.tag(0)
                 Page(title: "Condiciones", useBottomInset: true) { ConditionsView() }.tag(1)
                 Page(title: "Últimas \(StationService.historyHours) h") { HistoryChartView() }.tag(2)
                 Page(title: "Previsión") { ForecastView() }.tag(3)
@@ -59,7 +60,7 @@ struct ContentView: View {
 
 /// Página con su título como cabecera.
 private struct Page<Content: View>: View {
-    var title: String
+    var title: String?
     /// El TabView de páginas reserva ~39 pt abajo que en pantalla están vacíos. Si el
     /// contenido no cabe en lo que queda, watchOS desplaza la página antes de pasar a la
     /// siguiente (dos gestos). Las páginas de texto usan también esa franja.
@@ -68,10 +69,12 @@ private struct Page<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.headline)
-                .foregroundStyle(.tint)
-                .padding(.leading, 4)
+            if let title {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(.tint)
+                    .padding(.leading, 4)
+            }
             content
                 .frame(maxHeight: .infinity, alignment: .top)
         }

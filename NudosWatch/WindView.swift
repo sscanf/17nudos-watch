@@ -18,7 +18,7 @@ struct WindView: View {
             VStack(spacing: 4) {
                 HStack(alignment: .center, spacing: 8) {
                     CompassView(degrees: r.grados)
-                        .frame(width: 74, height: 74)
+                        .frame(width: 100, height: 100)
                         // centrada en el hueco entre el borde y los nudos, que cambian de ancho
                         .frame(maxWidth: .infinity)
                     VStack(alignment: .leading, spacing: 0) {
