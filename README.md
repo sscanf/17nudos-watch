@@ -2,7 +2,7 @@
 
 Apple Watch app showing live data from the [17nudos.com](https://www.17nudos.com) weather station in Castelldefels (Barcelona).
 
-- **Wind:** current speed, average, gust, direction and 15-minute trend (green above 8 kn, as on the website).
+- **Wind:** current speed, average, gust, direction and 15-minute trend (green above 8 kn, as on the website). The compass arrow points to where the wind comes from; tap it for a full-screen compass with exact degrees and the direction range over the last 15 minutes.
 - **Conditions:** temperature, humidity, pressure, 15-minute average and maximum gust.
 - **Chart** of the wind over the last 3 hours.
 - **Forecast:** hourly AEMET forecast published by 17nudos.com, as a 12-hour chart with wind direction; tap it for the full hour-by-hour list.
