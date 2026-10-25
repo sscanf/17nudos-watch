@@ -74,7 +74,7 @@ enum WindAlarm {
     private static func notify(value: Double, reading r: StationReading) {
         let content = UNMutableNotificationContent()
         content.title = "\(metric.name) \(Optional(value).fmt()) kn \(r.direccion)"
-        content.body = "Supera los \(Int(threshold)) kn en Castelldefels. "
+        content.body = "Supera los \(Int(threshold)) kn en \(Station.selected.place). "
             + "Promedio \(r.promedio.fmt()) · racha \(r.racha.fmt()) kn"
         content.sound = .default
         let request = UNNotificationRequest(identifier: "viento", content: content, trigger: nil)
@@ -107,7 +107,7 @@ final class AppDelegate: NSObject, WKApplicationDelegate, UNUserNotificationCent
                 continue
             }
             Task {
-                if WindAlarm.isEnabled, let r = try? await StationAPI.reading() {
+                if WindAlarm.isEnabled, let r = try? await Station.selected.source.reading() {
                     WindAlarm.check(r)
                 }
                 WindAlarm.scheduleBackgroundCheck()

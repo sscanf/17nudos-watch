@@ -29,8 +29,13 @@ Weather data and webcam images belong to 17nudos.com and their respective owners
 |---|---|
 | `NudosWatch/` | Watch app (screens, webcams, state) |
 | `NudosComplication/` | WidgetKit complication |
-| `Shared/` | Models, data access and colors, shared by both targets |
+| `Shared/` | Models, station abstraction and colors, shared by both targets |
+| `Shared/Stations/` | One data source per weather network (currently only 17nudos.com) |
 | `Config/` | Complication Info.plist |
+
+## Adding a station
+
+The app reads all its data through the `StationSource` protocol (`Shared/Station.swift`). To support another station, implement it in `Shared/Stations/` (only the live reading is required; history and forecast are optional) and add the station to `Station.all`. For now 17nudos.com is the only station.
 
 ## License
 

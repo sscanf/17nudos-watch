@@ -15,7 +15,7 @@ struct WindComplication: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Viento 17nudos")
-        .description("Viento en directo en Castelldefels.")
+        .description("Viento en directo en \(Station.selected.place).")
         .supportedFamilies([.accessoryCircular, .accessoryRectangular, .accessoryInline, .accessoryCorner])
     }
 }
@@ -43,12 +43,12 @@ struct WindProvider: TimelineProvider {
             completion(placeholder(in: context))
             return
         }
-        Task { completion(WindEntry(date: .now, reading: try? await StationAPI.reading())) }
+        Task { completion(WindEntry(date: .now, reading: try? await Station.selected.source.reading())) }
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<WindEntry>) -> Void) {
         Task {
-            let reading = try? await StationAPI.reading()
+            let reading = try? await Station.selected.source.reading()
             let next = Date.now.addingTimeInterval(reading == nil ? retry : refresh)
             completion(Timeline(entries: [WindEntry(date: .now, reading: reading)], policy: .after(next)))
         }
@@ -106,7 +106,7 @@ struct WindComplicationView: View {
                         .rotationEffect(.degrees(g))  // hacia donde viene
                         .foregroundStyle(Theme.naranja)
                 }
-                Text(r.map { "\($0.direccion) \($0.grados.fmt(0))°" } ?? "17nudos")
+                Text(r.map { "\($0.direccion) \($0.grados.fmt(0))°" } ?? Station.selected.name)
                     .font(.headline)
                     .widgetAccentable()
                 Spacer(minLength: 0)
@@ -123,7 +123,7 @@ struct WindComplicationView: View {
                     .foregroundStyle(Theme.viento(r?.racha))
             }
             .monospacedDigit()
-            Text(r == nil ? "Sin conexión" : "Castelldefels · \(entry.date.formatted(date: .omitted, time: .shortened))")
+            Text(r == nil ? "Sin conexión" : "\(Station.selected.place) · \(entry.date.formatted(date: .omitted, time: .shortened))")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
@@ -137,7 +137,7 @@ struct WindComplicationView: View {
             .foregroundStyle(speedColor)
             .widgetCurvesContent()
             .widgetLabel {
-                Text(r.map { "\($0.direccion) · R \($0.racha.fmt(0)) kn" } ?? "17nudos")
+                Text(r.map { "\($0.direccion) · R \($0.racha.fmt(0)) kn" } ?? Station.selected.name)
             }
     }
 

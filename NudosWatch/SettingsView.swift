@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Última página: ajustes de la app. Cada fila abre su pantalla, que sí puede desplazarse.
 struct SettingsView: View {
+    @Environment(StationService.self) private var service
     @AppStorage(WindAlarm.enabledKey) private var alarmOn = false
     @AppStorage(WindAlarm.thresholdKey) private var threshold = WindAlarm.defaultThreshold
     @AppStorage(WindAlarm.metricKey) private var metricRaw = WindAlarm.Metric.racha.rawValue
@@ -31,7 +32,7 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showAlarm) { AlarmSettingsView() }
 
-            Text("Datos de 17nudos.com · previsión de AEMET")
+            Text(service.station.attribution)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

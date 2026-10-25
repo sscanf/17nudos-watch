@@ -1,27 +1,6 @@
 import SwiftUI
 import UIKit
 
-/// Webcam de la web. Las cámaras son directos de YouTube incrustados con CamStreamer;
-/// el reloj no puede reproducir YouTube, así que se enseña la imagen del directo
-/// que publica YouTube (`hqdefault_live.jpg`), que se renueva cada pocos minutos.
-struct Camera: Identifiable {
-    var id: String { name }
-    var name: String
-    /// Página de CamStreamer que incrusta la web; de aquí se saca el vídeo de YouTube actual.
-    var embed: URL
-    /// Vídeo del directo cuando se hizo la app, por si la página de CamStreamer no responde.
-    var fallbackVideoID: String
-
-    static let all = [
-        Camera(name: "Escola Garbí",
-               embed: URL(string: "https://camstreamer.com/embed/209f5b9f1755eec/S-28530")!,
-               fallbackVideoID: "oe5GPi_C7Go"),
-        Camera(name: "Hacia Sitges",
-               embed: URL(string: "https://camstreamer.com/yt-embed/90b6a66d6c090c4/S-13556")!,
-               fallbackVideoID: "s6YqEV6Fs5M"),
-    ]
-}
-
 struct CameraView: View {
     var camera: Camera
 
@@ -104,7 +83,9 @@ struct CameraView: View {
 
     fileprivate static func currentVideoID(for camera: Camera) async -> String? {
         var req = URLRequest(url: camera.embed)
-        req.setValue("https://www.17nudos.com/", forHTTPHeaderField: "Referer")
+        if let referer = camera.referer {
+            req.setValue(referer.absoluteString, forHTTPHeaderField: "Referer")
+        }
         guard let (data, _) = try? await URLSession.shared.data(for: req),
               let html = String(data: data, encoding: .utf8),
               let m = html.firstMatch(of: #/youtube\.com/embed/([A-Za-z0-9_-]{11})/#)
@@ -237,5 +218,5 @@ private struct CameraZoomView: View {
 }
 
 #Preview {
-    CameraView(camera: Camera.all[0])
+    CameraView(camera: Station.nudos17.cameras[0])
 }

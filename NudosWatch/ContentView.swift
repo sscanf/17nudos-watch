@@ -27,9 +27,14 @@ struct ContentView: View {
                 // sin título: así cabe una brújula grande
                 Page(title: nil, useBottomInset: true) { WindView() }.tag(0)
                 Page(title: "Condiciones", useBottomInset: true) { ConditionsView() }.tag(1)
-                Page(title: "Últimas \(StationService.historyHours) h") { HistoryChartView() }.tag(2)
-                Page(title: "Previsión") { ForecastView() }.tag(3)
-                ForEach(Array(Camera.all.enumerated()), id: \.element.id) { i, cam in
+                // cada red da lo que da: sin histórico o sin previsión no hay página
+                if service.station.source.hasHistory {
+                    Page(title: "Últimas \(StationService.historyHours) h") { HistoryChartView() }.tag(2)
+                }
+                if service.station.source.hasForecast {
+                    Page(title: "Previsión") { ForecastView() }.tag(3)
+                }
+                ForEach(Array(service.station.cameras.enumerated()), id: \.element.id) { i, cam in
                     Page(title: "Cámara") { CameraView(camera: cam) }.tag(4 + i)
                 }
             }

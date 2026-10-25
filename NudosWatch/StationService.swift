@@ -1,10 +1,11 @@
 import Foundation
 import Observation
 
-/// Estado de la app: última lectura de la estación y gráfica.
+/// Estado de la app: última lectura de la estación elegida, gráfica y previsión.
 @MainActor
 @Observable
 final class StationService {
+    let station: Station
     private(set) var reading: StationReading?
     private(set) var history: WindHistory?
     private(set) var forecast: Forecast?
@@ -26,7 +27,9 @@ final class StationService {
     /// AEMET actualiza la previsión pocas veces al día.
     static let forecastEvery: TimeInterval = 30 * 60
 
-    init(reading: StationReading? = nil, history: WindHistory? = nil, forecast: Forecast? = nil) {
+    init(station: Station = .selected, reading: StationReading? = nil, history: WindHistory? = nil,
+         forecast: Forecast? = nil) {
+        self.station = station
         self.reading = reading
         self.history = history
         self.forecast = forecast
@@ -40,13 +43,14 @@ final class StationService {
         isLoading = true
         defer { isLoading = false }
         do {
-            async let r = StationAPI.reading()
-            if includeHistory {
+            let source = station.source
+            async let r = source.reading()
+            if includeHistory, source.hasHistory {
                 // la gráfica es secundaria: si falla, se conserva la anterior
-                history = (try? await StationAPI.history(hours: Self.historyHours)) ?? history
+                history = (try? await source.history(hours: Self.historyHours)) ?? history
             }
-            if forecastFetch.map({ Date.now.timeIntervalSince($0) > Self.forecastEvery }) ?? true,
-               let f = try? await StationAPI.forecast() {
+            if source.hasForecast, forecastFetch.map({ Date.now.timeIntervalSince($0) > Self.forecastEvery }) ?? true,
+               let f = try? await source.forecast() {
                 forecast = f
                 forecastFetch = .now
             }
