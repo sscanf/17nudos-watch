@@ -40,7 +40,7 @@ struct ForecastView: View {
                                     Image(systemName: "location.north.fill")
                                         .font(.system(size: 9))
                                         .foregroundStyle(Theme.viento(h.viento, base: Theme.gris))
-                                        .rotationEffect(.degrees(deg + 180))
+                                        .rotationEffect(.degrees(deg))  // hacia donde viene
                                 }
                         }
                     }
@@ -136,7 +136,7 @@ struct ForecastList: View {
                     .frame(width: 26, alignment: .leading)
                 Image(systemName: "location.north.fill")
                     .font(.system(size: 11))
-                    .rotationEffect(.degrees((hour.grados ?? 0) + 180))
+                    .rotationEffect(.degrees(hour.grados ?? 0))
                     .opacity(hour.grados == nil ? 0 : 1)
                     .foregroundStyle(Theme.viento(hour.viento, base: Theme.gris))
                 VStack(alignment: .leading, spacing: 0) {

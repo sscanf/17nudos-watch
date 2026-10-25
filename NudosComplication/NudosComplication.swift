@@ -73,15 +73,15 @@ struct WindComplicationView: View {
     private var r: StationReading? { entry.reading }
     private var speedColor: Color { Theme.viento(r?.actual) }
 
-    /// Velocidad en el centro y una flecha en el borde que marca hacia dónde sopla.
+    /// Velocidad en el centro y, en el borde por donde entra el viento, un triángulo hacia el centro.
     private var circular: some View {
         ZStack {
             AccessoryWidgetBackground()
             if let g = r?.grados {
-                Image(systemName: "arrowtriangle.up.fill")
+                Image(systemName: "arrowtriangle.down.fill")
                     .font(.system(size: 8))
                     .offset(y: -20)
-                    .rotationEffect(.degrees(g + 180))
+                    .rotationEffect(.degrees(g))
                     .foregroundStyle(Theme.naranja)
                     .widgetAccentable()
             }
@@ -103,7 +103,7 @@ struct WindComplicationView: View {
             HStack(spacing: 3) {
                 if let g = r?.grados {
                     Image(systemName: "location.north.fill")
-                        .rotationEffect(.degrees(g + 180))
+                        .rotationEffect(.degrees(g))  // hacia donde viene
                         .foregroundStyle(Theme.naranja)
                 }
                 Text(r.map { "\($0.direccion) \($0.grados.fmt(0))°" } ?? "17nudos")

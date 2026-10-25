@@ -141,8 +141,8 @@ private struct TrendRow: View {
     }
 }
 
-/// Rosa de los vientos con una flecha que indica hacia dónde sopla el viento
-/// (igual que las flechas de la gráfica de la web).
+/// Rosa de los vientos con una flecha que apunta hacia donde viene el viento
+/// (al revés que las flechas de la gráfica de la web, que marcan hacia dónde sopla).
 struct CompassView: View {
     var degrees: Double?
 
@@ -163,7 +163,7 @@ struct CompassView: View {
                     Image(systemName: "location.north.fill")
                         .font(.system(size: d * 0.34))
                         .foregroundStyle(Theme.naranja)
-                        .rotationEffect(.degrees(degrees + 180))
+                        .rotationEffect(.degrees(degrees))
                         .animation(.easeInOut, value: degrees)
                 }
             }
